@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Learning to Adapt Risk via Differentiable CVaR Barrier Functions">
+  <meta name="keywords" content="CVaR, Barrier Functions, Risk Adaptive Control,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning to Adapt Risk via Differentiable CVaR Barrier Functions
+</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script defer src="./static/js/sim-rollout-demos.js?v=20260327-unicycle-id-seed-634"></script>
+</head>
+<body>
+
+<!-- Sticky section nav (RoboMME-style); appears after scrolling past the abstract -->
+<div class="section-nav" id="sectionNav">
+  <div class="section-nav-inner">
+    <a class="section-nav-link" href="#sec-animations" data-target="sec-animations">Risk Adaptation</a>
+    <a class="section-nav-link" href="#sec-settings" data-target="sec-settings">Settings</a>
+    <a class="section-nav-link" href="#sec-id-demos" data-target="sec-id-demos">In-Distribution Demos</a>
+    <a class="section-nav-link" href="#sec-ood-demos" data-target="sec-ood-demos">Out-of-Distribution Demos</a>
+    <a class="section-nav-link" href="#sec-results" data-target="sec-results">Statistical Results</a>
+    <!-- <a class="section-nav-link" href="#sec-video" data-target="sec-video">Video</a> -->
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <!-- <div class="page-home-row">
+        <a class="page-home-link" href="https://lawliet9666.github.io" title="Home" aria-label="Home">
+          <span class="icon"><i class="fas fa-home"></i></span>
+        </a>
+      </div> -->
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            <span class="publication-title-line">Learning to Adapt Risk via</span>
+            <span class="publication-title-line">Differentiable CVaR Barrier Functions</span>
+          </h1>
+          <!--
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://lawliet9666.github.io">Xinyi Wang</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://www.taekyung.me">Taekyung Kim</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://www.bhoxha.com/">Bardh Hoxha</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.fainekos.net/">Georgios Fainekos</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://websites.umich.edu/~dpanagou/">Dimitra Panagou</a><sup>1</sup>,
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Department of Robotics, University of Michigan,</span>
+            <span class="author-block"><sup>2</sup>Toyota North America Research &amp; Development</span>
+          </div>
+          -->
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Anonymous</span>
+          </div>
+
+          <!-- <div class="is-size-5 publication-authors">
+            <span class="author-block">Anonymous</span>
+          </div> -->
+
+          <div class="has-text-centered" style="margin-top: 1.25rem;">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-link is-normal is-rounded">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- <span class="link-block">
+                <a href="https://arxiv.org/abs/2011.12948"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span> -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-link is-normal is-rounded">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-link is-normal is-rounded">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- <section class="section" style="padding-top: 0; padding-bottom: 1rem;">
+  <div class="container is-widescreen mme-wide">
+    <p class="has-text-centered mme-tldr">
+      <strong>TL;DR:</strong> Risk-adaptive CVaR barrier functions let a robot trade off safety and feasibility in crowded uncertain environments by adjusting its risk level online while keeping probabilistic safety guarantees.
+    </p>
+  </div>
+</section> -->
+
+<section id="sec-abstract" class="section" style="padding-top: 0;">
+  <div class="container is-widescreen mme-wide">
+    <section class="tldr-wrap">
+      <h2 class="tldr-title has-text-centered">TL;DR</h2>
+      <p class="tldr-copy">
+        <strong>Learning to adapt risk online</strong> is critical for navigation in uncertain crowds. We present an <strong>end-to-end risk-adaptive framework</strong> that combines <strong>reinforcement learning with a differentiable CVaR barrier-function safety layer</strong>, jointly learning nominal control, risk level, and safety margin while enforcing <strong>probabilistic safety guarantees</strong>. This lets the robot stay cautious in difficult interactions without becoming unnecessarily conservative, and it performs strongly across varying obstacle densities, robot models, and <strong>OOD crowd shifts</strong>.
+      </p>
+    </section>
+  </div>
+</section>
+
+<!-- <section id="sec-motivation" class="section mme-section-muted">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Motivation</h2>
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content">
+          <img src="./static/videos/iros2025_web.gif"
+               alt="Dolly zoom effect"
+               style="max-width: 100%; height: auto;"/>
+        </div>
+      </div>
+      <div class="column">
+        <div class="content">
+          <img src="./static/images/wang2025irosv1.png"
+               alt="Matting example"
+               style="max-width: 100%; height: auto;"/>
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <p class="has-text-justified" style="margin-top: 1.5rem;">
+          (a) A fixed risk level is not flexible enough: A low risk tolerance enhances safety but can render the optimization infeasible, 
+          whereas a high risk tolerance improves feasibility at the expense of safety. <br/>
+          (b) In highly dynamic scenarios, where obstacles move unpredictably and rapidly, the robot requires sufficient time and space to respond and adjust its
+          risk level. <br/>
+          (c) Our method dynamically adjusts the risk level within an extended risk range to maintain feasibility while ensuring user-defined probabilistic safety. The robot proactively modifies its trajectory before approaching obstacles, but only when necessary, thus avoiding unnecessary conservatism.
+        </p>
+      </div>
+</div>
+
+  </div>
+</section> -->
+
+<!-- Method Overview Section -->
+<section id="sec-method" class="section method-overview-section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Method Overview</h2>
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered method-overview-card">
+          <img src="./static/images/overview.png"
+               alt="Method Overview Figure"
+               class="method-overview-image"
+               style="height: auto;" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-animations" class="hero is-light is-small obstacle-carousel-section">
+  <div class="hero-body">
+    <div class="container is-widescreen mme-wide">
+      <h2 class="title is-3 has-text-centered">How Does Risk Adaptation Work?</h2>
+      <div class="risk-adaptation-takeaways">
+        <p class="has-text-centered obstacle-carousel-intro risk-adaptation-subtitle">
+          The coupling between <strong>risk level &beta;</strong> and <strong>safety margin &Delta;R</strong> improves behavior in two key ways:
+        </p>
+        <ul class="risk-adaptation-points">
+          <li class="risk-adaptation-point">
+            <strong>Prevent entering bad situations:</strong> the robot stays more conservative early on, helping it avoid crowded or high-risk regions in the first place.
+          </li>
+          <li class="risk-adaptation-point">
+            <strong>Stay stable when constraints become unavoidable:</strong> their combination reduces oscillation, hesitation, and unsafe reactions, leading to smoother and more consistent decisions.
+          </li>
+        </ul>
+      </div>
+      <div class="risk-adaptation-grid">
+        <div class="risk-adaptation-card">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-policy">u<sub>nom</sub></div>
+          <h3 class="risk-adaptation-heading">Policy</h3>
+          <p class="risk-adaptation-copy">Drives maximum efficiency.</p>
+        </div>
+        <div class="risk-adaptation-card">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-risk">&beta;</div>
+          <h3 class="risk-adaptation-heading">Risk Level</h3>
+          <p class="risk-adaptation-copy">Adjusts sensitivity to high-risk interactions within [0, &beta;<sub>u</sub>]</p>
+        </div>
+        <div class="risk-adaptation-card">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-margin">&Delta;R</div>
+          <h3 class="risk-adaptation-heading">Safety Margin</h3>
+          <p class="risk-adaptation-copy">Adjusts adaptive spatial buffer when extra caution is needed.</p>
+        </div>
+      </div>
+      <div class="risk-adaptation-layer">
+        <div class="risk-adaptation-card risk-adaptation-card-layer">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-layer">Differentiable CVaR-BF-QP Layer</div>
+          <p class="risk-adaptation-copy risk-adaptation-layer-copy">
+            <code>min 1/2 ||u - u<sub>nom</sub>||<sup>2</sup></code> subject to <code>CVaR<sub>&beta;</sub>(H<sub>m</sub>(&Delta;R)) &gt;= 0</code>,<br>
+            Provides a probabilistic safety guarantee.
+          </p>
+        </div>
+      </div>
+      <div id="carousel-obstacle-animations" class="carousel results-carousel obstacle-results-carousel">
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/20260322_092244_ckpt_10000000_seeds_n18_176_989_beta_rsafe_u/eval_ep_11_seed_634_succ_1_coll_0.gif"
+               alt="Risk adaptation demo episode 1"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 1</div>
+        </div>
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/20260322_092244_ckpt_10000000_seeds_n18_176_989_beta_rsafe_u/eval_ep_7_seed_589_succ_1_coll_0.gif"
+               alt="Risk adaptation demo episode 2"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 2</div>
+        </div>
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/20260322_092244_ckpt_10000000_seeds_n18_176_989_beta_rsafe_u/eval_ep_8_seed_590_succ_1_coll_0.gif"
+               alt="Risk adaptation demo episode 3"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 3</div>
+        </div>
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/20260322_092244_ckpt_10000000_seeds_n18_176_989_beta_rsafe_u/eval_ep_9_seed_599_succ_1_coll_0.gif"
+               alt="Risk adaptation demo episode 4"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 4</div>
+        </div>
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/20260322_092244_ckpt_10000000_seeds_n18_176_989_beta_rsafe_u/eval_ep_10_seed_615_succ_1_coll_0.gif"
+               alt="Risk adaptation demo episode 5"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 5</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-settings" class="section mme-section-muted exp-settings-section">
+  <div class="container is-widescreen mme-wide">
+    <h2 class="title is-3 has-text-centered">Simulation Settings</h2>
+
+    <div class="exp-settings-card">
+      <div class="table-container">
+        <table class="table is-fullwidth exp-settings-table">
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Setting</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Obstacle Uncertainty Models</th>
+              <td>
+                <table class="exp-baseline-table exp-detail-table">
+                  <tbody>
+                    <tr>
+                      <th>Obstacle model</th>
+                      <td>20 dynamic circular obstacles, each with radius R<sub>o</sub> = 0.4 m, speeds sampled in [0.5, 1.5] m/s, and randomized initial positions and velocities.</td>
+                    </tr>
+                    <tr>
+                      <th>Uncertainty model</th>
+                      <td>Obstacle action uncertainty is modeled as a 3-mode GMM with one forward mode and two lateral modes. The weights [0.6, 0.2, 0.2] indicate how likely each mode is, while the standard deviations [0.1, 0.2, 0.2] indicate how spread out each mode is.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <th>Control Limits</th>
+              <td>
+                <table class="exp-baseline-table exp-detail-table">
+                  <tbody>
+                    <tr>
+                      <th>Single-integrator</th>
+                      <td>||u|| &lt;= 1.5 m/s.</td>
+                    </tr>
+                    <tr>
+                      <th>Unicycle</th>
+                      <td>v &isin; [-1.5, 1.5] m/s and &omega; &isin; [-&pi;/2, &pi;/2] rad/s.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <th>Policy Action</th>
+              <td>
+                <table class="exp-baseline-table exp-detail-table">
+                  <tbody>
+                    <tr>
+                      <th>Action form</th>
+                      <td>a<sub>t</sub> = (u<sub>nom,t</sub>, &beta;<sub>t</sub>, &Delta;R<sub>t</sub>).</td>
+                    </tr>
+                    <tr>
+                      <th>Single-integrator</th>
+                      <td>u<sub>nom,t</sub> = [u<sub>x</sub>, u<sub>y</sub>]<sup>T</sup> &isin; R<sup>2</sup>.</td>
+                    </tr>
+                    <tr>
+                      <th>Unicycle</th>
+                      <td>u<sub>nom,t</sub> = [v<sub>t</sub>, &omega;<sub>t</sub>]<sup>T</sup> &isin; R<sup>2</sup>.</td>
+                    </tr>
+                    <tr>
+                      <th>Adaptive parameters</th>
+                      <td>&beta;<sub>t</sub> &isin; [0, &beta;<sub>u</sub>] is the adaptive CVaR risk level, with user-defined upper bound &beta;<sub>u</sub> = 0.5. &Delta;R<sub>t</sub> &isin; [0, 1.5(R<sub>r</sub> + R<sub>o</sub>)] is the adaptive safety margin, where R<sub>r</sub> and R<sub>o</sub> are the robot and obstacle radii.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <th>Baselines</th>
+              <td>
+                <table class="exp-baseline-table">
+                  <tbody>
+                    <tr>
+                      <th>Optimization</th>
+                      <td>ORCA, CBF-QP, CVaR-BF-QP, Adaptive-CVaR-BF</td>
+                    </tr>
+                    <tr>
+                      <th>RL</th>
+                      <td>Vanilla RL, CrowdNav++ (const vel), CrowdNav++ (inferred)</td>
+                    </tr>
+                    <tr>
+                      <th>RL + Optimization</th>
+                      <td>Safety-filtered RL variants, BarrierNet, Proposed</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <!-- <tr>
+              <th>Evaluation Protocol</th>
+              <td>Main comparisons use 20 obstacles; Table I averages results over 10 random seeds with 50 evaluation episodes per seed. The OOD study evaluates ORCA-based obstacle policy, 30-obstacle density, and increased obstacle radius.</td>
+            </tr> -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="exp-settings-points">
+      <div class="exp-settings-point">
+        <strong>Stochastic &amp; Unpredictable</strong>
+      </div>
+      <div class="exp-settings-point">
+        <strong>Uncooperative &amp; Dense</strong>
+      </div>
+      <div class="exp-settings-point">
+        <strong>Constrained &amp; Diverse Models</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- <section id="sec-baseline-si" class="hero is-light is-small">
+  <h2 class="title is-4 has-text-centered">In distribution: obstacle number 20 baselines comparison for single integrator</h2>
+  <div class="hero-body">
+    <div class="container">
+      <div id="carousel-baselines-single-integrator" class="carousel results-carousel">
+        <div class="item item-chair-tp has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_rcbf_doubleint_v2_gamma0.1_betaNone_hcone.gif"
+               id="baseline-si-rcbf"
+               alt="RCBF (Collision Cone), single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            RCBF (Collision Cone)
+          </div>
+        </div>
+        <div class="item item-steve has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cbf_doubleint_v2_gamma0.1_betaNone_hcone.gif"
+               id="baseline-si-cbf"
+               alt="CBF (Collision Cone), single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CBF (Collision Cone)
+          </div>
+        </div>
+        <div class="item item-steve has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cvar_doubleint_v2_gamma0.1_beta0.01_hdist.gif"
+               id="baseline-si-cvar-b01"
+               alt="CVaR distance β=0.01, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CVaR (Distance) β = 0.1
+          </div>
+        </div>
+        <div class="item item-chair-tp has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cvar_doubleint_v2_gamma0.1_beta0.99_hdist.gif"
+               id="baseline-si-cvar-b99"
+               alt="CVaR distance β=0.99, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CVaR (Distance) β = 0.99
+          </div>
+        </div>
+        <div class="item item-chair-tp has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_orca_plus_doubleint_v2_gamma0.1_betaNone_hdist.gif"
+               id="baseline-si-orca"
+               alt="ORCA, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            ORCA
+          </div>
+        </div>
+        <div class="item item-shiba has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_trajectory_animation.gif"
+               id="baseline-si-crowdnav"
+               alt="CrowdNav RL, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CrowdNav (RL)
+          </div>
+        </div>
+        <div class="item item-fullbody has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_trajectory_animation_crowd++.gif"
+               id="baseline-si-crowdnavpp"
+               alt="CrowdNav++ RL, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CrowdNav++ (RL)
+          </div>
+        </div>
+        <div class="item item-blueshirt has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cvar_beta_dt_doubleint_v2_gamma0.1_betaNone_hdist_cone.gif"
+               id="baseline-si-proposed"
+               alt="Proposed method, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            Proposed method
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<section id="sec-sim-rollouts" class="section demo-parallel-section">
+  <div class="container is-widescreen mme-wide">
+    <div class="sim-demo-grid">
+      <div id="sec-id-demos" class="sim-demo-column">
+        <h2 class="title is-3 has-text-centered sim-rollout-title">In-Distribution Demos</h2>
+        <div id="simIdRolloutModeApp" class="sim-rollout-app" aria-live="polite">
+          <div class="sim-mode-tabs-wrap">
+            <div class="sim-mode-tabs" role="tablist" aria-label="ID robot mode">
+              <button type="button" class="sim-mode-tab" data-mode-id="single-integrator" role="tab" aria-selected="false">Single Integrator</button>
+              <button type="button" class="sim-mode-tab active" data-mode-id="unicycle" role="tab" aria-selected="true">Unicycle</button>
+            </div>
+          </div>
+          <div class="sim-mode-panels">
+            <div class="sim-mode-panel" data-mode-panel="single-integrator">
+              <div id="simIdRolloutAppSingle" class="sim-rollout-app"></div>
+            </div>
+            <div class="sim-mode-panel active" data-mode-panel="unicycle">
+              <div id="simIdRolloutAppUnicycle" class="sim-rollout-app"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="sec-ood-demos" class="sim-demo-column">
+        <h2 class="title is-3 has-text-centered sim-rollout-title">Out-of-Distribution Demos</h2>
+        <div id="simRolloutModeApp" class="sim-rollout-app" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-results" class="section mme-section-muted">
+  <div class="container is-widescreen mme-wide content">
+    <h2 class="title is-3 has-text-centered">Statistical Results</h2>
+
+    <div class="mme-findings-col">
+      <div id="exp-table-i" class="mme-finding-body mme-finding-panel rq-figure-panel">
+        <figure class="rq-figure">
+          <div class="rq-figure-frame">
+            <img
+              class="rq-figure-image"
+              src="./static/images/id_data.png"
+              alt="Table I baseline comparison in 20-obstacle environments"
+              loading="lazy"
+            >
+          </div>
+        </figure>
+      </div>
+
+      <div id="exp-fig-success-rate-unicycle-obs" class="mme-finding-body mme-finding-panel rq-figure-panel">
+        <figure class="rq-figure">
+          <div class="rq-figure-frame">
+            <img
+              class="rq-figure-image"
+              src="./static/images/success_rate_vs_obstacles_unicycle.png"
+              alt="Success rate versus obstacle count for the unicycle model"
+              loading="lazy"
+            >
+          </div>
+        </figure>
+      </div>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q1: How do different method types compare in dynamic environments?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <p class="mme-key-line">
+            RL + Optimization methods provide the strongest overall safety and task performance.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Optimization:</strong> lower success due to infeasibility in dynamic scenes.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Pure RL:</strong> better efficiency, but higher collision rates.
+          </p>
+          <p class="mme-body-copy">
+            <strong>RL + Optimization:</strong> more reliable and consistently safer.
+          </p>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q2: How do different ways of integrating safety into RL affect performance?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <p class="mme-key-line">
+            Jointly training RL with safety constraints significantly outperforms decoupled post-hoc filtering.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Post-hoc Filtering:</strong> improves reliability over pure RL, but remains decoupled and suboptimal.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Joint Optimization:</strong> end-to-end training via differentiable safety layers (Proposed, BarrierNet) enables adaptive risk-aware behavior.
+          </p>
+          <p class="mme-body-copy">
+            The proposed method outperforms BarrierNet by explicitly modeling stochastic uncertainty and learning adaptive risk parameters, which leads to stronger performance in dynamic environments.
+          </p>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q3: How robust are the methods across different robot models and obstacle densities?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <p class="mme-key-line">
+            The proposed method maintains strong performance despite more constrained dynamics and denser crowds.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Robot Models:</strong> trends remain consistent; unicycle dynamics naturally reduce overall success compared to single-integrator due to stricter constraints.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Obstacle Density:</strong> navigation success drops in denser crowds, but RL + Optimization approaches degrade more gracefully.
+          </p>
+          <p class="mme-body-copy">
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
+            <a class="mme-evidence-chip" href="#exp-fig-success-rate-unicycle-obs">Figure I</a>
+          </div>
+        </div>
+      </details>
+
+      <div id="exp-table-ii" class="mme-finding-body mme-finding-panel rq-figure-panel">
+        <figure class="rq-figure">
+          <div class="rq-figure-frame">
+            <img
+              class="rq-figure-image"
+              src="./static/images/ood_data.png"
+              alt="Table II out-of-distribution generalization under environment shifts"
+              loading="lazy"
+            >
+          </div>
+        </figure>
+      </div>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q4: How robust are different type of methods under OOD environment changes?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <p class="mme-key-line">
+            OOD shifts hurt pure RL the most; adaptive safety improves robustness.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Vanilla RL:</strong> largest performance drop under OOD changes.
+          </p>
+          <p class="mme-body-copy">
+            <strong>RL + Safety Filter:</strong> recovers much of the lost robustness, but still trails.
+          </p>
+          <p class="mme-body-copy">
+            <strong>Proposed method:</strong> best OOD performance with competitive safety.
+          </p>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-table-ii">Table II</a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+
+<!-- <section id="sec-video" class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Video</h2>
+        <div class="publication-video">
+          <iframe src="https://www.youtube.com/embed/VHRnmXToLN8?si=CifUAystyr5iiycB"
+                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+
+<!-- <section class="section" id="acknowledgement">
+  <div class="container is-max-desktop content">
+    <h2 class="title">Acknowledgement</h2>
+    <p>
+      This work was supported in part by Toyota Research Institute of North America (TRINA) and the University of Michigan Robotics Department. 
+      The authors would like to thank their collaborators, lab members, and Yinpei Dai for their valuable feedback and discussions.
+    </p>
+  </div>
+</section> -->
+
+
+<section class="section" id="sec-bib">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <!-- <pre><code>@article{wang2025safe,
+  title={Learning to Adapt Risk via Differentiable CVaR Barrier Functions},
+  author={Wang, Xinyi and Kim, Taekyung and Hoxha, Bardh and Fainekos, Georgios and Panagou, Dimitra},
+  conference={IROS},
+  year={2025}
+}
+</code></pre> -->
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <span class="icon-link">
+        <i class="fas fa-file-pdf"></i>
+      </span>
+      <span class="icon-link external-link" aria-disabled="true">
+        <i class="fab fa-github"></i>
+      </span>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <!-- <p>
+            This means you are free to borrow the <a
+              href="https://github.com/Lawliet9666/rlcvarbf">source code</a> of this website,
+            we just ask that you link back to this page in the footer.
+            Please remember to remove the analytics code included in the header of the website which
+            you do not want on your website.
+          </p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var nav = document.getElementById('sectionNav');
+  if (!nav) return;
+  var links = nav.querySelectorAll('.section-nav-link');
+  var triggerEl = document.getElementById('sec-abstract');
+  var sectionIds = ['sec-animations', 'sec-settings', 'sec-id-demos', 'sec-ood-demos', 'sec-results' /* 'sec-video' */];
+  var sections = sectionIds.map(function (id) { return document.getElementById(id); });
+  var navHeight = 52;
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      var id = this.getAttribute('data-target');
+      var target = id ? document.getElementById(id) : null;
+      if (target) {
+        var top = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      window.requestAnimationFrame(function () {
+        if (triggerEl) {
+          var triggerTop = triggerEl.getBoundingClientRect().top;
+          if (triggerTop <= navHeight) {
+            nav.classList.add('visible');
+          } else {
+            nav.classList.remove('visible');
+          }
+        }
+
+        var current = '';
+        for (var i = sections.length - 1; i >= 0; i--) {
+          if (sections[i] && sections[i].getBoundingClientRect().top <= navHeight + 60) {
+            current = sectionIds[i];
+            break;
+          }
+        }
+        links.forEach(function (link) {
+          if (link.getAttribute('data-target') === current) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
