@@ -549,16 +549,30 @@
       </div>
 
       <div id="exp-fig-success-rate-unicycle-obs" class="mme-finding-body mme-finding-panel rq-figure-panel">
-        <figure class="rq-figure">
-          <div class="rq-figure-frame">
-            <img
-              class="rq-figure-image"
-              src="./static/images/success_rate_vs_obstacles_unicycle.png"
-              alt="Success rate versus obstacle count for the unicycle model"
-              loading="lazy"
-            >
-          </div>
-        </figure>
+        <div class="rq-figure-grid">
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/success_rate_vs_obstacles_single_integrator.png"
+                alt="Success rate versus obstacle count for the single-integrator model"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Single-integrator</figcaption>
+          </figure>
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/success_rate_vs_obstacles_unicycle.png"
+                alt="Success rate versus obstacle count for the unicycle model"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Unicycle</figcaption>
+          </figure>
+        </div>
       </div>
 
       <details class="mme-finding" open>
@@ -568,17 +582,13 @@
         </summary>
         <div class="mme-finding-body">
           <p class="mme-key-line">
-            RL + Optimization methods provide the strongest overall safety and task performance.
+            RL + Optimization: best safety &amp; efficiency.
           </p>
-          <p class="mme-body-copy">
-            <strong>Optimization:</strong> lower success due to infeasibility in dynamic scenes.
-          </p>
-          <p class="mme-body-copy">
-            <strong>Pure RL:</strong> better efficiency, but higher collision rates.
-          </p>
-          <p class="mme-body-copy">
-            <strong>RL + Optimization:</strong> more reliable and consistently safer.
-          </p>
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>RL + Optimization:</strong> best safety &amp; efficiency.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>Optimization only:</strong> lower success rate due to infeasibility.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>RL only:</strong> efficient but no formal safety guarantee.</li>
+          </ul>
           <div class="mme-evidence-row">
             <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
           </div>
@@ -592,17 +602,13 @@
         </summary>
         <div class="mme-finding-body">
           <p class="mme-key-line">
-            Jointly training RL with safety constraints significantly outperforms decoupled post-hoc filtering.
+            End-to-end training outperforms decoupled post-hoc safety filtering.
           </p>
-          <p class="mme-body-copy">
-            <strong>Post-hoc Filtering:</strong> improves reliability over pure RL, but remains decoupled and suboptimal.
-          </p>
-          <p class="mme-body-copy">
-            <strong>Joint Optimization:</strong> end-to-end training via differentiable safety layers (Proposed, BarrierNet) enables adaptive risk-aware behavior.
-          </p>
-          <p class="mme-body-copy">
-            The proposed method outperforms BarrierNet by explicitly modeling stochastic uncertainty and learning adaptive risk parameters, which leads to stronger performance in dynamic environments.
-          </p>
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>End-to-end training:</strong> outperforms decoupled post-hoc safety filtering.</li>
+            <li class="mme-bullet mme-bullet--neu">Joint learning eliminates the optimality gap.</li>
+            <li class="mme-bullet mme-bullet--neu">Outperforms BarrierNet by modeling stochastic uncertainty.</li>
+          </ul>
           <div class="mme-evidence-row">
             <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
           </div>
@@ -616,15 +622,13 @@
         </summary>
         <div class="mme-finding-body">
           <p class="mme-key-line">
-            The proposed method maintains strong performance despite more constrained dynamics and denser crowds.
+            Proposed method: most robust among others, with graceful degradation.
           </p>
-          <p class="mme-body-copy">
-            <strong>Robot Models:</strong> trends remain consistent; unicycle dynamics naturally reduce overall success compared to single-integrator due to stricter constraints.
-          </p>
-          <p class="mme-body-copy">
-            <strong>Obstacle Density:</strong> navigation success drops in denser crowds, but RL + Optimization approaches degrade more gracefully.
-          </p>
-          <p class="mme-body-copy">
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>Proposed method:</strong> most robust among others, with graceful degradation.</li>
+            <li class="mme-bullet mme-bullet--neu"><strong>Robot Models:</strong> trends remain consistent.</li>
+            <li class="mme-bullet mme-bullet--neu"><strong>Obstacle Density:</strong> degrade gracefully.</li>
+          </ul>
           <div class="mme-evidence-row">
             <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
             <a class="mme-evidence-chip" href="#exp-fig-success-rate-unicycle-obs">Figure I</a>
@@ -652,17 +656,13 @@
         </summary>
         <div class="mme-finding-body">
           <p class="mme-key-line">
-            OOD shifts hurt pure RL the most; adaptive safety improves robustness.
+            Adaptation gives best OOD success rate.
           </p>
-          <p class="mme-body-copy">
-            <strong>Vanilla RL:</strong> largest performance drop under OOD changes.
-          </p>
-          <p class="mme-body-copy">
-            <strong>RL + Safety Filter:</strong> recovers much of the lost robustness, but still trails.
-          </p>
-          <p class="mme-body-copy">
-            <strong>Proposed method:</strong> best OOD performance with competitive safety.
-          </p>
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>Proposed method:</strong> adaptation gives best OOD success rate.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>RL only:</strong> degrades most under unseen policy shifts.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>RL + Safety Filter:</strong> regains robustness but still lags behind.</li>
+          </ul>
           <div class="mme-evidence-row">
             <a class="mme-evidence-chip" href="#exp-table-ii">Table II</a>
           </div>
