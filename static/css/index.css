@@ -554,12 +554,36 @@ table.rq-table-paper .rq-cell-highlight {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  align-items: end;
+}
+
+.rq-figure-grid .rq-figure {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
+}
+
+.rq-figure-grid .rq-figure-frame {
+  width: 100%;
+  align-items: center;
+}
+
+.rq-figure-grid .rq-figure-image {
+  height: 320px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 @media (max-width: 720px) {
   .rq-figure-grid {
     grid-template-columns: 1fr;
+  }
+
+  .rq-figure-grid .rq-figure-image {
+    height: auto;
+    width: 100%;
   }
 }
 
