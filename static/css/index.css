@@ -554,7 +554,7 @@ table.rq-table-paper .rq-cell-highlight {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  align-items: start;
+  align-items: center;
 }
 
 @media (max-width: 720px) {
