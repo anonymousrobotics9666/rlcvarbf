@@ -100,6 +100,13 @@ body {
 .publication-body img {
 }
 
+.gazebo-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
 .results-carousel {
   overflow: hidden;
 }
@@ -288,6 +295,18 @@ body {
   font-size: 1rem;
   font-weight: 700;
   color: #22336c;
+}
+
+.obstacle-extra-row {
+  margin-top: 1.5rem;
+}
+
+.isaac-sim-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(32, 55, 105, 0.08);
 }
 
 .method-overview-section {
