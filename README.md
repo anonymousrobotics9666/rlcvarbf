@@ -2,7 +2,7 @@
 
 Live site: **https://lawliet9666.github.io/rlcvarbf/**
 
-Related repo: [cvarbf](https://github.com/Lawliet9666/cvarbf)
+Related repo: [Reinforcement-Learning-Adaptive-CVaR-Barrier-Function](https://github.com/anonymousrobotics9666/Reinforcement-Learning-Adaptive-CVaR-Barrier-Function)
 
 If you find it useful for your work please cite:
 ```
