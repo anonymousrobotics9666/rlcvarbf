@@ -576,11 +576,17 @@ table.rq-table-paper .rq-cell-highlight {
   align-items: end;
 }
 
+.rq-figure-grid--single {
+  grid-template-columns: minmax(0, 900px);
+  justify-content: center;
+}
+
 .rq-figure-grid .rq-figure {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
+  margin: 0;
 }
 
 .rq-figure-grid .rq-figure-frame {
@@ -593,6 +599,11 @@ table.rq-table-paper .rq-cell-highlight {
   width: auto;
   max-width: 100%;
   object-fit: contain;
+}
+
+.rq-figure-grid--single .rq-figure-image {
+  width: 100%;
+  height: auto;
 }
 
 @media (max-width: 720px) {
