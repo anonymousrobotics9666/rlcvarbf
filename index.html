@@ -558,16 +558,30 @@
 
     <div class="mme-findings-col">
       <div id="exp-table-i" class="mme-finding-body mme-finding-panel rq-figure-panel">
-        <figure class="rq-figure">
-          <div class="rq-figure-frame">
-            <img
-              class="rq-figure-image"
-              src="./static/images/id_data.png"
-              alt="Table I baseline comparison in 20-obstacle environments"
-              loading="lazy"
-            >
-          </div>
-        </figure>
+        <div class="rq-figure-grid rq-figure-grid--single">
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/table_i_single_integrator.png?v=20260728"
+                alt="Table I baseline comparison for the single-integrator model in a 20-obstacle environment"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Table I(a) — Single-integrator</figcaption>
+          </figure>
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/table_i_unicycle.png?v=20260728"
+                alt="Table I baseline comparison for the unicycle model in a 20-obstacle environment"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Table I(b) — Unicycle</figcaption>
+          </figure>
+        </div>
       </div>
 
       <div id="exp-fig-success-rate-unicycle-obs" class="mme-finding-body mme-finding-panel rq-figure-panel">
@@ -639,16 +653,19 @@
       </details>
 
       <div id="exp-table-ii" class="mme-finding-body mme-finding-panel rq-figure-panel">
-        <figure class="rq-figure">
-          <div class="rq-figure-frame">
-            <img
-              class="rq-figure-image"
-              src="./static/images/ood_data.png"
-              alt="Table II out-of-distribution generalization under environment shifts"
-              loading="lazy"
-            >
-          </div>
-        </figure>
+        <div class="rq-figure-grid rq-figure-grid--single">
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/table_ii_unicycle_ood.png?v=20260728"
+                alt="Table II out-of-distribution generalization for the unicycle model under obstacle-density and obstacle-radius shifts"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Table II — Unicycle</figcaption>
+          </figure>
+        </div>
       </div>
 
       <details class="mme-finding" open>
