@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pdftoppm -png -r 200 -singlefile overview.pdf overview)"
+    ]
+  }
+}

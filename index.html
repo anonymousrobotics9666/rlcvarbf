@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Reinforcement Learning for Risk Adaptation via Differentiable CVaR Barrier Functions">
+  <meta name="keywords" content="CVaR, Barrier Functions, Risk Adaptive Control,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reinforcement Learning for Risk Adaptation via Differentiable CVaR Barrier Functions
+</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css?v=20260811-settings-v1">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script defer src="./static/js/sim-rollout-demos.js?v=20260811-ood-cases-v1"></script>
+</head>
+<body>
+
+<!-- Sticky section nav (RoboMME-style); appears after scrolling past the abstract -->
+<div class="section-nav" id="sectionNav">
+  <div class="section-nav-inner">
+    <a class="section-nav-link" href="#sec-animations" data-target="sec-animations">Risk Adaptation</a>
+    <a class="section-nav-link" href="#sec-settings" data-target="sec-settings">Settings</a>
+    <a class="section-nav-link" href="#sec-id-demos" data-target="sec-id-demos">In-Distribution Demos</a>
+    <a class="section-nav-link" href="#sec-ood-demos" data-target="sec-ood-demos">Out-of-Distribution Demos</a>
+    <a class="section-nav-link" href="#sec-results" data-target="sec-results">Statistical Results</a>
+    <!-- <a class="section-nav-link" href="#sec-video" data-target="sec-video">Video</a> -->
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            <span class="publication-title-line">Reinforcement Learning for Risk Adaptation via</span>
+            <span class="publication-title-line">Differentiable CVaR Barrier Functions</span>
+          </h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Anonymous</span>
+          </div>
+
+          <div class="has-text-centered" style="margin-top: 1.25rem;">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-link is-normal is-rounded">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- <span class="link-block">
+                <a href="https://arxiv.org/abs/2011.12948"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span> -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-link is-normal is-rounded">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/anonymousrobotics9666/Reinforcement-Learning-Adaptive-CVaR-Barrier-Function"
+                   class="external-link button is-link is-normal is-rounded">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="https://anonymousroboticsfan123.github.io/crowdnav-playground/"
+                   class="external-link button is-link is-normal is-rounded">
+                  <span class="icon">
+                      <i class="fas fa-gamepad"></i>
+                  </span>
+                  <span>Playgrounds</span>
+                </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- <section class="section" style="padding-top: 0; padding-bottom: 1rem;">
+  <div class="container is-widescreen mme-wide">
+    <p class="has-text-centered mme-tldr">
+      <strong>TL;DR:</strong> Risk-adaptive CVaR barrier functions let a robot trade off safety and feasibility in crowded uncertain environments by adjusting its risk level online while keeping probabilistic safety guarantees.
+    </p>
+  </div>
+</section> -->
+
+<section id="sec-abstract" class="section" style="padding-top: 0;">
+  <div class="container is-widescreen mme-wide">
+    <section class="tldr-wrap">
+      <h2 class="tldr-title has-text-centered">TL;DR</h2>
+      <p class="tldr-copy">
+        <strong>Learning to adapt risk online</strong> is critical for navigation in uncertain crowds. We present an <strong>end-to-end risk-adaptive framework</strong> that combines <strong>reinforcement learning with a differentiable CVaR barrier-function safety layer</strong>, jointly learning nominal control, risk level, and safety margin while enforcing <strong>probabilistic safety guarantees</strong>. This lets the robot stay cautious in difficult interactions without becoming unnecessarily conservative, and it performs strongly across varying obstacle densities, robot models, and <strong>OOD crowd shifts</strong>.
+      </p>
+    </section>
+  </div>
+</section>
+
+<!-- <section id="sec-motivation" class="section mme-section-muted">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Motivation</h2>
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content">
+          <img src="./static/videos/iros2025_web.gif"
+               alt="Dolly zoom effect"
+               style="max-width: 100%; height: auto;"/>
+        </div>
+      </div>
+      <div class="column">
+        <div class="content">
+          <img src="./static/images/wang2025irosv1.png"
+               alt="Matting example"
+               style="max-width: 100%; height: auto;"/>
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <p class="has-text-justified" style="margin-top: 1.5rem;">
+          (a) A fixed risk level is not flexible enough: A low risk tolerance enhances safety but can render the optimization infeasible, 
+          whereas a high risk tolerance improves feasibility at the expense of safety. <br/>
+          (b) In highly dynamic scenarios, where obstacles move unpredictably and rapidly, the robot requires sufficient time and space to respond and adjust its
+          risk level. <br/>
+          (c) Our method dynamically adjusts the risk level within an extended risk range to maintain feasibility while ensuring user-defined probabilistic safety. The robot proactively modifies its trajectory before approaching obstacles, but only when necessary, thus avoiding unnecessary conservatism.
+        </p>
+      </div>
+</div>
+
+  </div>
+</section> -->
+
+<!-- Method Overview Section -->
+<section id="sec-method" class="section method-overview-section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Method Overview</h2>
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered method-overview-card">
+          <img src="./static/images/overview2.png?v=20260728-paper"
+               alt="Method Overview Figure"
+               class="method-overview-image"
+               style="height: auto;" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-animations" class="hero is-light is-small obstacle-carousel-section">
+  <div class="hero-body">
+    <div class="container is-widescreen mme-wide">
+      <h2 class="title is-3 has-text-centered">How Does Risk Adaptation Work?</h2>
+      <div class="risk-adaptation-takeaways">
+        <p class="has-text-centered obstacle-carousel-intro risk-adaptation-subtitle">
+          Risk adaptation combines <strong>reactive obstacle-wise risk allocation</strong> with a <strong>proactive safety margin</strong>.
+        </p>
+        <ul class="risk-adaptation-points">
+          <li class="risk-adaptation-point">
+            <strong>Reactive risk allocation &beta;<sub>i,k</sub>:</strong> adjusts how much collision risk the policy is willing to tolerate as the perceived danger from obstacle <em>i</em> changes.
+          </li>
+          <li class="risk-adaptation-point">
+            <strong>Proactive safety margin &Delta;R<sub>i,k</sub>:</strong> expands the physical keep-out distance before an obstacle becomes imminent, giving the robot space and time to respond while avoiding unnecessary conservatism.
+          </li>
+        </ul>
+      </div>
+      <div class="risk-adaptation-grid">
+        <div class="risk-adaptation-card">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-policy">u<sub>nom</sub></div>
+          <h3 class="risk-adaptation-heading">Policy</h3>
+          <p class="risk-adaptation-copy">Produces the nominal control input u<sub>nom,k</sub> for task performance.</p>
+        </div>
+        <div class="risk-adaptation-card">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-risk">&beta;<sub>i,k</sub></div>
+          <h3 class="risk-adaptation-heading">Reactive Risk Allocation</h3>
+          <p class="risk-adaptation-copy">Reactively allocates the shared risk budget across active obstacles as perceived danger changes.</p>
+        </div>
+        <div class="risk-adaptation-card">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-margin">&Delta;R<sub>i,k</sub></div>
+          <h3 class="risk-adaptation-heading">Proactive Safety Margin</h3>
+          <p class="risk-adaptation-copy">Proactively adjusts the obstacle-wise keep-out distance to create room for maneuver before danger becomes imminent.</p>
+        </div>
+      </div>
+      <div class="risk-adaptation-layer">
+        <div class="risk-adaptation-card risk-adaptation-card-layer">
+          <div class="risk-adaptation-symbol risk-adaptation-symbol-layer">Differentiable CVaR-BF-QP Layer</div>
+          <p class="risk-adaptation-copy risk-adaptation-layer-copy">
+            <code>u<sub>nom,k</sub>, {&beta;<sub>i,k</sub>}, {&Delta;R<sub>i,k</sub>}</code>
+            &rarr; <strong>Differentiable CVaR-BF-QP</strong> &rarr; <code>u<sub>k</sub><sup>*</sup></code><br>
+            <!-- Combines the nominal control with the obstacle-wise risk allocation and safety margin, then solves a slack-relaxed QP with mode-wise CVaR-BF constraints under GMM obstacle-motion uncertainty. -->
+          </p>
+        </div>
+      </div>
+      <div id="carousel-obstacle-animations" class="carousel results-carousel obstacle-results-carousel">
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/risk_adaptation_diagnostic_ckpt_14336000/seed_174_success.gif"
+               alt="Risk adaptation demo episode 1"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 1</div>
+        </div>
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/risk_adaptation_diagnostic_ckpt_14336000/seed_166_success.gif"
+               alt="Risk adaptation demo episode 2"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 2</div>
+        </div>
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/risk_adaptation_diagnostic_ckpt_14336000/seed_200_success.gif"
+               alt="Risk adaptation demo episode 3"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 3</div>
+        </div>
+        <div class="item obstacle-carousel-item has-text-centered">
+          <img src="./static/videos/risk_adaptation_diagnostic_ckpt_14336000/seed_900_success.gif"
+               alt="Risk adaptation demo episode 4"
+               class="obstacle-carousel-image">
+          <div class="obstacle-carousel-caption">Episode 4</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="sec-settings" class="section mme-section-muted exp-settings-section">
+  <div class="container is-widescreen mme-wide">
+    <h2 class="title is-3 has-text-centered">Simulation Settings</h2>
+
+    <div class="exp-settings-grid">
+      <article class="exp-settings-card">
+        <header class="exp-settings-card-header">
+          <span class="exp-settings-index">01</span>
+          <h3>Environment &amp; Uncertainty</h3>
+        </header>
+        <dl class="exp-settings-list">
+          <div class="exp-settings-row">
+            <dt>Workspace</dt>
+            <dd>[-6, 6] &times; [-6, 6] m</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Obstacles</dt>
+            <dd>20 dynamic circles; radius 0.4 m; speed in [0.5, 1.5] m/s</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Human motion</dt>
+            <dd>Social-force policy with <code>avoid_robot = false</code></dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Uncertainty</dt>
+            <dd>Three-mode GMM; weights [0.6, 0.2, 0.2], standard deviations [0.1, 0.2, 0.2], lateral ratio 0.3</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="exp-settings-card">
+        <header class="exp-settings-card-header">
+          <span class="exp-settings-index">02</span>
+          <h3>Robot &amp; Control</h3>
+        </header>
+        <dl class="exp-settings-list">
+          <div class="exp-settings-row">
+            <dt>Dynamics</dt>
+            <dd>Single-integrator and unicycle; robot radius 0.3 m</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Single-integrator</dt>
+            <dd>||u|| &le; 1.5 m/s</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Unicycle</dt>
+            <dd>v &isin; [-1.5, 1.5] m/s; &omega; &isin; [-1.57, 1.57] rad/s</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Simulation</dt>
+            <dd>&Delta;t = 0.1 s; 400 steps per episode; goal tolerance 0.6 m</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Observation</dt>
+            <dd>20 m sensing range with three-frame history</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="exp-settings-card">
+        <header class="exp-settings-card-header">
+          <span class="exp-settings-index">03</span>
+          <h3>QP</h3>
+        </header>
+        <dl class="exp-settings-list">
+          <div class="exp-settings-row">
+            <dt>Policy output</dt>
+            <dd>u<sub>nom,k</sub>, {&beta;<sub>i,k</sub>}, and {&Delta;R<sub>i,k</sub>}</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Risk allocation</dt>
+            <dd>Total budget 0.5 with &beta;<sub>min</sub> = 0.05</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Safety margin</dt>
+            <dd>Base margin 0.05 m; maximum adaptive increment 1.125 m</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>QP parameter</dt>
+            <dd>Class-K gain &alpha; = 2.0</dd>
+          </div>
+          <div class="exp-settings-row">
+            <dt>Solver</dt>
+            <dd>Differentiable JAX <code>qpth</code> QP layer with slack weight 10.0</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="exp-settings-card exp-settings-card-wide">
+        <header class="exp-settings-card-header">
+          <span class="exp-settings-index">04</span>
+          <h3>Evaluation Protocol</h3>
+        </header>
+        <div class="exp-evaluation-grid">
+          <div class="exp-evaluation-item">
+            <span>Final statistics</span>
+            <strong>10 base seeds &times; 50 episodes</strong>
+          </div>
+          <div class="exp-evaluation-item">
+            <span>Episode horizon</span>
+            <strong>40 s (400 steps)</strong>
+          </div>
+          <div class="exp-evaluation-item">
+            <span>OOD conditions</span>
+            <strong>30 obstacles and obstacle radius increased to 0.5 m</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- <section id="sec-baseline-si" class="hero is-light is-small">
+  <h2 class="title is-4 has-text-centered">In distribution: obstacle number 20 baselines comparison for single integrator</h2>
+  <div class="hero-body">
+    <div class="container">
+      <div id="carousel-baselines-single-integrator" class="carousel results-carousel">
+        <div class="item item-chair-tp has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_rcbf_doubleint_v2_gamma0.1_betaNone_hcone.gif"
+               id="baseline-si-rcbf"
+               alt="RCBF (Collision Cone), single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            RCBF (Collision Cone)
+          </div>
+        </div>
+        <div class="item item-steve has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cbf_doubleint_v2_gamma0.1_betaNone_hcone.gif"
+               id="baseline-si-cbf"
+               alt="CBF (Collision Cone), single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CBF (Collision Cone)
+          </div>
+        </div>
+        <div class="item item-steve has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cvar_doubleint_v2_gamma0.1_beta0.01_hdist.gif"
+               id="baseline-si-cvar-b01"
+               alt="CVaR distance β=0.01, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CVaR (Distance) β = 0.1
+          </div>
+        </div>
+        <div class="item item-chair-tp has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cvar_doubleint_v2_gamma0.1_beta0.99_hdist.gif"
+               id="baseline-si-cvar-b99"
+               alt="CVaR distance β=0.99, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CVaR (Distance) β = 0.99
+          </div>
+        </div>
+        <div class="item item-chair-tp has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_orca_plus_doubleint_v2_gamma0.1_betaNone_hdist.gif"
+               id="baseline-si-orca"
+               alt="ORCA, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            ORCA
+          </div>
+        </div>
+        <div class="item item-shiba has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_trajectory_animation.gif"
+               id="baseline-si-crowdnav"
+               alt="CrowdNav RL, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CrowdNav (RL)
+          </div>
+        </div>
+        <div class="item item-fullbody has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_trajectory_animation_crowd++.gif"
+               id="baseline-si-crowdnavpp"
+               alt="CrowdNav++ RL, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            CrowdNav++ (RL)
+          </div>
+        </div>
+        <div class="item item-blueshirt has-text-centered">
+          <img src="./static/videos/compare/seed13_noise0.025_obs8_umax0.9_besfm_umax0.3_besfm_cvar_beta_dt_doubleint_v2_gamma0.1_betaNone_hdist_cone.gif"
+               id="baseline-si-proposed"
+               alt="Proposed method, single integrator"
+               style="max-width: 100%; height: auto;">
+          <div style="margin-top: 0.5rem; font-size: 1rem; font-weight: bold; color: #22336c;">
+            Proposed method
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<section id="sec-sim-rollouts" class="section demo-parallel-section">
+  <div class="container is-widescreen mme-wide">
+    <div class="sim-demo-grid">
+      <div id="sec-id-demos" class="sim-demo-column">
+        <h2 class="title is-3 has-text-centered sim-rollout-title">In-Distribution Demos</h2>
+        <div id="simIdRolloutModeApp" class="sim-rollout-app" aria-live="polite">
+          <div class="sim-mode-tabs-wrap">
+            <div class="sim-mode-tabs" role="tablist" aria-label="ID robot mode">
+              <button type="button" class="sim-mode-tab" data-mode-id="single-integrator" role="tab" aria-selected="false">Single Integrator</button>
+              <button type="button" class="sim-mode-tab active" data-mode-id="unicycle" role="tab" aria-selected="true">Unicycle</button>
+            </div>
+          </div>
+          <div class="sim-mode-panels">
+            <div class="sim-mode-panel" data-mode-panel="single-integrator">
+              <div id="simIdRolloutAppSingle" class="sim-rollout-app"></div>
+            </div>
+            <div class="sim-mode-panel active" data-mode-panel="unicycle">
+              <div id="simIdRolloutAppUnicycle" class="sim-rollout-app"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="sec-ood-demos" class="sim-demo-column">
+        <h2 class="title is-3 has-text-centered sim-rollout-title">Out-of-Distribution Demos</h2>
+        <div id="simRolloutModeApp" class="sim-rollout-app" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-compared-methods" class="section exp-methods-section">
+  <div class="container is-widescreen mme-wide">
+    <h2 class="title is-4 has-text-centered">Compared Methods</h2>
+    <p class="exp-methods-intro has-text-centered">
+      We compare optimization-based controllers, learned navigation policies, and hybrid safety-filtered methods.
+    </p>
+    <div class="exp-methods-grid">
+      <article class="exp-methods-group">
+        <span>Optimization</span>
+        <p>ORCA, CBF-QP, CVaR-BF-QP, and Adaptive-CVaR-BF-QP</p>
+      </article>
+      <article class="exp-methods-group">
+        <span>Reinforcement Learning</span>
+        <p>Vanilla RL and CrowdNav++ with constant-velocity or inferred obstacle motion</p>
+      </article>
+      <article class="exp-methods-group exp-methods-group-accent">
+        <span>RL + Optimization</span>
+        <p>Safety-filtered RL variants, BarrierNet, and the proposed Diff-CVaR-GNN</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-results" class="section mme-section-muted">
+  <div class="container is-widescreen mme-wide content">
+    <h2 class="title is-3 has-text-centered">Statistical Results</h2>
+
+    <div class="mme-findings-col">
+      <div id="exp-table-i" class="mme-finding-body mme-finding-panel rq-figure-panel">
+        <div class="rq-figure-grid rq-figure-grid--single">
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/table_i_single_integrator.png?v=20260728"
+                alt="Table I baseline comparison for the single-integrator model in a 20-obstacle environment"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Table I(a) — Single-integrator</figcaption>
+          </figure>
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/table_i_unicycle.png?v=20260728"
+                alt="Table I baseline comparison for the unicycle model in a 20-obstacle environment"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Table I(b) — Unicycle</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div id="exp-fig-success-rate-unicycle-obs" class="mme-finding-body mme-finding-panel rq-figure-panel">
+        <div class="rq-figure-grid rq-figure-grid--single">
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/success_rate_vs_obstacles_unicycle.png?v=20260728-unicycle-v2"
+                alt="Success rate versus obstacle count for the unicycle model"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">Unicycle</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q1: How do different method types compare in dynamic environments?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>RL + Optimization:</strong> best safety &amp; efficiency.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>Optimization only:</strong> lower success rate due to infeasibility.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>RL only:</strong> efficient but no formal safety guarantee.</li>
+          </ul>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q2: How do different ways of integrating safety into RL affect performance?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>End-to-end training:</strong> outperforms decoupled post-hoc safety filtering.</li>
+            <li class="mme-bullet mme-bullet--neu">Joint learning eliminates the optimality gap.</li>
+            <li class="mme-bullet mme-bullet--neu">Outperforms BarrierNet by modeling stochastic uncertainty.</li>
+          </ul>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-table-i">Table I</a>
+          </div>
+        </div>
+      </details>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q3: How robust are all methods across obstacle densities?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>Proposed method:</strong> most robust among others, with graceful degradation.</li>
+            <li class="mme-bullet mme-bullet--neu"><strong>Obstacle Density:</strong> degrade gracefully.</li>
+          </ul>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-fig-success-rate-unicycle-obs">Figure I</a>
+          </div>
+        </div>
+      </details>
+
+      <div id="exp-table-ii" class="mme-finding-body mme-finding-panel rq-figure-panel">
+        <div class="rq-figure-grid rq-figure-grid--single">
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/table_ii_unicycle_ood.png?v=20260728"
+                alt="Table II out-of-distribution generalization for the unicycle model. Case I uses 30 obstacles; Case II increases the obstacle radius to 0.5 meters"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">
+              Table II — Unicycle<br>
+              <strong>Case I:</strong> high obstacle density (30 obstacles).
+              <strong>Case II:</strong> increased obstacle radius (0.5 m).
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q4: How robust are different type of methods under OOD environment changes?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos"><strong>Proposed method:</strong> adaptation gives best OOD success rate.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>RL only:</strong> degrades most under unseen policy shifts.</li>
+            <li class="mme-bullet mme-bullet--neg"><strong>RL + Safety Filter:</strong> regains robustness but still lags behind.</li>
+          </ul>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-table-ii">Table II</a>
+          </div>
+        </div>
+      </details>
+
+      <div id="exp-gmm-robustness" class="mme-finding-body mme-finding-panel gmm-result-anchor">
+        <div class="rq-table-wrap">
+          <table class="rq-table">
+            <thead>
+              <tr>
+                <th scope="col">Setting</th>
+                <th scope="col">Weights [w<sub>1</sub>, w<sub>2</sub>, w<sub>3</sub>]</th>
+                <th scope="col">Stds [&sigma;<sub>1</sub>, &sigma;<sub>2</sub>, &sigma;<sub>3</sub>]</th>
+                <th scope="col">Lat.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Matched / oracle GMM</th>
+                <td>[0.6, 0.2, 0.2]</td>
+                <td>[0.1, 0.2, 0.2]</td>
+                <td>0.3</td>
+              </tr>
+              <tr>
+                <th scope="row">A.1 Policy overestimates uncertainty</th>
+                <td>[0.8, 0.1, 0.1]</td>
+                <td>[0.05, 0.1, 0.1]</td>
+                <td>0.2</td>
+              </tr>
+              <tr>
+                <th scope="row">A.2 Policy underestimates uncertainty</th>
+                <td>[0.4, 0.3, 0.3]</td>
+                <td>[0.2, 0.4, 0.4]</td>
+                <td>0.4</td>
+              </tr>
+              <tr>
+                <th scope="row">B Imbalanced mode weights</th>
+                <td>[0.9, 0.05, 0.05]</td>
+                <td>[0.1, 0.2, 0.2]</td>
+                <td>0.3</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="rq-caption">
+          <strong>GMM parameter settings.</strong> The policy keeps the matched/oracle belief fixed while the environment parameters change. Lat. denotes the lateral-mode displacement ratio.
+        </p>
+
+        <div class="gmm-visualization" aria-labelledby="gmm-trajectories-heading">
+          <h3 id="gmm-trajectories-heading" class="gmm-visualization-title">GMM trajectory examples</h3>
+          <p class="gmm-visualization-intro">
+            All animations use the same reset seed and a fixed policy; only the environment GMM changes. The matched/oracle animation is the common baseline for both groups.
+          </p>
+
+          <section class="gmm-figure-group" aria-labelledby="gmm-group-a-heading">
+            <h4 id="gmm-group-a-heading" class="gmm-figure-group-title">Group A &mdash; uncertainty mismatch</h4>
+            <div class="gmm-figure-grid gmm-figure-grid--three">
+              <figure class="gmm-figure">
+                <img
+                  src="./static/videos/gmm_robustness/gmm_matched_oracle.gif"
+                  alt="Six-second environment trajectory animation for the matched oracle GMM"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <figcaption><strong>A.0</strong> Matched / oracle GMM</figcaption>
+              </figure>
+              <figure class="gmm-figure">
+                <img
+                  src="./static/videos/gmm_robustness/gmm_policy_overestimates_uncertainty.gif"
+                  alt="Six-second environment trajectory animation when the policy overestimates GMM uncertainty"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <figcaption><strong>A.1</strong> Policy overestimates uncertainty</figcaption>
+              </figure>
+              <figure class="gmm-figure">
+                <img
+                  src="./static/videos/gmm_robustness/gmm_policy_underestimates_uncertainty.gif"
+                  alt="Six-second environment trajectory animation when the policy underestimates GMM uncertainty"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <figcaption><strong>A.2</strong> Policy underestimates uncertainty</figcaption>
+              </figure>
+            </div>
+          </section>
+
+          <section class="gmm-figure-group" aria-labelledby="gmm-group-b-heading">
+            <h4 id="gmm-group-b-heading" class="gmm-figure-group-title">Group B &mdash; mode-weight mismatch</h4>
+            <div class="gmm-figure-grid gmm-figure-grid--two">
+              <figure class="gmm-figure">
+                <img
+                  src="./static/videos/gmm_robustness/gmm_matched_oracle.gif"
+                  alt="Six-second environment trajectory animation for the matched oracle GMM baseline in Group B"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <figcaption><strong>B.0</strong> Matched / oracle GMM</figcaption>
+              </figure>
+              <figure class="gmm-figure">
+                <img
+                  src="./static/videos/gmm_robustness/gmm_imbalanced_weights.gif"
+                  alt="Six-second environment trajectory animation for imbalanced GMM mode weights"
+                  loading="lazy"
+                  decoding="async"
+                >
+                <figcaption><strong>B.1</strong> Imbalanced mode weights</figcaption>
+              </figure>
+            </div>
+          </section>
+        </div>
+
+        <div class="rq-table-wrap">
+          <table class="rq-table">
+            <thead>
+              <tr>
+                <th scope="col">GMM Setting</th>
+                <th scope="col">Success Rate (%)</th>
+                <th scope="col">Collision Rate (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Matched / oracle GMM</th>
+                <td>97.0</td>
+                <td>2.6</td>
+              </tr>
+              <tr>
+                <th scope="row">A.1 Policy overestimates uncertainty</th>
+                <td>97.4</td>
+                <td>2.4</td>
+              </tr>
+              <tr>
+                <th scope="row">A.2 Policy underestimates uncertainty</th>
+                <td>92.4</td>
+                <td>6.2</td>
+              </tr>
+              <tr>
+                <th scope="row">B Imbalanced mode weights</th>
+                <td>96.8</td>
+                <td>2.6</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="rq-caption">
+          <strong>Table III &mdash; Unicycle</strong>
+        </p>
+      </div>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q5: How robust is the method to GMM mismatch?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos">The method shows empirical robustness to moderate GMM mismatch, with graceful degradation when uncertainty is underestimated.</li>
+          </ul>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-gmm-robustness">Table III</a>
+          </div>
+        </div>
+      </details>
+
+      <div id="exp-ablation" class="mme-finding-body mme-finding-panel rq-figure-panel">
+        <div class="rq-figure-grid rq-figure-grid--single">
+          <figure class="rq-figure">
+            <div class="rq-figure-frame">
+              <img
+                class="rq-figure-image"
+                src="./static/images/ablation_table_unicycle.png?v=20260811"
+                alt="Ablation study of adaptive risk allocation, adaptive safety margin, and the safety layer for the unicycle model"
+                loading="lazy"
+              >
+            </div>
+            <figcaption class="rq-figure-caption">
+              Table IV &mdash; Unicycle<br>
+              Policy 1: full; Policy 2: fixed risk; Policy 3: fixed margin; Policy 4: both fixed; Policy 5: no safety layer.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <details class="mme-finding" open>
+        <summary class="mme-finding-summary">
+          <span class="mme-finding-title">Q6: How does each adaptive component affect performance?</span>
+          <span class="mme-finding-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="mme-finding-body">
+          <ul class="mme-bullet-list">
+            <li class="mme-bullet mme-bullet--pos">Each adaptive component contributes: the full method achieves 97.0% SR and 2.6% CR, while removing the safety layer causes the largest degradation.</li>
+          </ul>
+          <div class="mme-evidence-row">
+            <a class="mme-evidence-chip" href="#exp-ablation">Table IV</a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-gazebo" class="section">
+  <div class="container is-widescreen mme-wide">
+    <h2 class="title is-3 has-text-centered">Real-Time Safe Navigation</h2>
+    <div class="columns is-centered is-variable is-5">
+      <div class="column is-half">
+        <img
+          class="gazebo-video"
+          src="./static/videos/si_obs_30/single_integrator_obs_30/isaac_as_sim/ros2_113719_matched_2x.gif"
+          alt="Real-time safe navigation with ROS 2"
+        >
+      </div>
+      <div class="column is-half">
+        <img
+          class="gazebo-video"
+          src="./static/videos/si_obs_30/single_integrator_obs_30/isaac_as_sim/isaac_as_sim_20260524_113618_2x.gif"
+          alt="Real-time safe navigation in Isaac Sim"
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-extra-demos" class="hero is-light is-small obstacle-carousel-section">
+  <div class="hero-body">
+    <div class="container is-widescreen mme-wide">
+      <div class="obstacle-results-carousel obstacle-extra-row columns is-centered is-multiline">
+        <div class="column is-4">
+          <div class="item obstacle-carousel-item has-text-centered">
+            <img src="./static/videos/si_obs_30/single_integrator_obs_30/isaac_as_sim/seed_251_succ_1_coll_0_2x.gif"
+                 alt="Risk adaptation demo episode 6"
+                 class="obstacle-carousel-image">
+            <div class="obstacle-carousel-caption">Episode 6</div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="item obstacle-carousel-item has-text-centered">
+            <img src="./static/videos/si_obs_30/single_integrator_obs_30/isaac_as_sim/seed_802_succ_1_coll_0_2x.gif"
+                 alt="Risk adaptation demo episode 7"
+                 class="obstacle-carousel-image">
+            <div class="obstacle-carousel-caption">Episode 7</div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="item obstacle-carousel-item has-text-centered">
+            <img src="./static/videos/si_obs_30/single_integrator_obs_30/isaac_as_sim/seed_989_succ_1_coll_0_2x.gif"
+                 alt="Risk adaptation demo episode 8"
+                 class="obstacle-carousel-image">
+            <div class="obstacle-carousel-caption">Episode 8</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <span class="icon-link">
+        <i class="fas fa-file-pdf"></i>
+      </span>
+      <span class="icon-link external-link" aria-disabled="true">
+        <i class="fab fa-github"></i>
+      </span>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var nav = document.getElementById('sectionNav');
+  if (!nav) return;
+  var links = nav.querySelectorAll('.section-nav-link');
+  var triggerEl = document.getElementById('sec-abstract');
+  var sectionIds = ['sec-animations', 'sec-settings', 'sec-id-demos', 'sec-ood-demos', 'sec-results' /* 'sec-video' */];
+  var sections = sectionIds.map(function (id) { return document.getElementById(id); });
+  var navHeight = 52;
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      var id = this.getAttribute('data-target');
+      var target = id ? document.getElementById(id) : null;
+      if (target) {
+        var top = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      window.requestAnimationFrame(function () {
+        if (triggerEl) {
+          var triggerTop = triggerEl.getBoundingClientRect().top;
+          if (triggerTop <= navHeight) {
+            nav.classList.add('visible');
+          } else {
+            nav.classList.remove('visible');
+          }
+        }
+
+        var current = '';
+        for (var i = sections.length - 1; i >= 0; i--) {
+          if (sections[i] && sections[i].getBoundingClientRect().top <= navHeight + 60) {
+            current = sectionIds[i];
+            break;
+          }
+        }
+        links.forEach(function (link) {
+          if (link.getAttribute('data-target') === current) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
